@@ -18,6 +18,27 @@ if(isset($date['send'])){
 	if(trim($date['phone'] == '')){
 		$errors[] = 'Введите телефон';
 	}
+	$error = true;
+	$secret = '6LelvaYZAAAAAAwGFaYY0RBFKIfUWWCDE-p5ThfI';
+
+	if (!empty($_POST['g-recaptcha-response'])) {
+		$curl = curl_init('https://www.google.com/recaptcha/api/siteverify');
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, 'secret=' . $secret . '&response=' . $_POST['g-recaptcha-response']);
+		$out = curl_exec($curl);
+		curl_close($curl);
+		
+		$out = json_decode($out);
+		if ($out->success == true) {
+			$error = false;
+		} 
+	}    
+	 
+		if ($error) {
+		$errors[]='Ошибка заполнения капчи.';
+
+	}
 	// Если ошибок нет, то все ок
 	if(empty($errors)){
 		if(isset($date['send'])){
